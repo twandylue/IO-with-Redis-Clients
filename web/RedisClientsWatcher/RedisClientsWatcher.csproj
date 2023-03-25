@@ -7,4 +7,9 @@
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Plotly.Blazor" Version="2.18.2" />
+      <PackageReference Include="StackExchange.Redis" Version="2.5.61" />
+    </ItemGroup>
+
 </Project>
