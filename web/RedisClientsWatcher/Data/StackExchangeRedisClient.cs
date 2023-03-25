@@ -23,8 +23,26 @@ public class StackExchangeRedisClient : IRedisClient
 
     public async Task Set(string key, string value)
     {
-        this._logger.LogInformation("Setting value for key: {Key}", key);
+        this._logger.LogInformation("Setting value for key: {Key}, value: {Value}", key, value);
 
         await this._db.StringSetAsync(key, value);
+    }
+
+    public async Task<string> SetIdempotentValue(string key, string value)
+    {
+        this._logger.LogInformation("Set idempotent value for key: {Key}, value: {Value}", key, value);
+
+        if (await this._db.KeyExistsAsync(key))
+        {
+            this._logger.LogInformation("Key: {Key} is already in the cache", key);
+            var valueInCache = await this._db.StringGetAsync(key);
+
+            return valueInCache;
+        }
+
+        this._logger.LogInformation("Setting value for key: {Key}, value: {Value}", key, value);
+        await this._db.StringSetAsync(key, value);
+
+        return value;
     }
 }

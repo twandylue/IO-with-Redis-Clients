@@ -1,0 +1,60 @@
+﻿@page "/setdata"
+
+<PageTitle>Set data into Redis</PageTitle>
+
+@using RedisClientsWatcher.Data
+@using System.Text.Json
+@inject StackExchangeRedisClient RedisClient
+
+<h1>You can set data into Redis by input key and value here</h1>
+<h3>Set Data</h3>
+<p>This component demonstrates setting the datae(key, value) into the Redis in indompotent way, which means if the key is already set in the cache, value would not be set into the cache again</p>
+
+@if (RedisClient == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    <p role="status">Current Key: @key</p>
+    <p role="status">Current Value: </p>
+    <code role="status">
+        @ConvertToFormattedJson(_result)
+    </code>
+    
+    <p>---------------------------------------------------</p>
+    <p role="status">Set the (key, value): (@key, <code>@_content</code>) in the Cache(Redis)</p>
+    <button class="btn btn-primary" @onclick="SetValue">Click me to Set the data</button>
+}
+
+@code {
+    private string _result = "No result";
+    private const string key = "Cache_key";
+    private readonly string _content = JsonSerializer.Serialize(new { Name = "Andy", Age = 29 });
+
+    private async Task SetValue()
+    {
+        _result = await RedisClient.SetIdempotentValue(key, _content);
+    }
+    
+    private static string ConvertToFormattedJson(string json)
+    {
+        var options = new JsonSerializerOptions
+        {
+            WriteIndented = true
+        };
+
+        try
+        {
+            var jsonElement = JsonSerializer.Deserialize<JsonElement>(json);
+            return JsonSerializer.Serialize(jsonElement, options);
+        }
+        catch (Exception)
+        {
+            Console.WriteLine($"'{json}' is not a valid json string");
+            return json;
+        }
+    }
+}
