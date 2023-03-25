@@ -1,0 +1,20 @@
+services:
+  postgres:
+    container_name: "demo_db"
+    environment:
+      - POSTGRES_DB=demo_db
+      - POSTGRES_PASSWORD=guest
+    image: postgres:11
+    ports:
+      - "5432:5432"
+  redis:
+    container_name: "demo_redis"
+    image: redis:5.0.6
+    ports:
+      - "6379:6379"
+  web:
+    build: ./web/RedisClientsWatcher
+    command: dotnet run --project ./web/RedisClientsWatcher/RedisClientsWatcher.csproj
+    ports:
+      - "7045:80"
+version: '3.8'
