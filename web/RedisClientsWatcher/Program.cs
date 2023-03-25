@@ -1,6 +1,35 @@
 using RedisClientsWatcher.Data;
+using RedisClientsWatcher.Loggers;
+using Serilog;
+using Serilog.Filters;
+
+int minWorkerThreads = int.TryParse(Environment.GetEnvironmentVariable("MIN_WORKER_THREADS"), out minWorkerThreads) ? minWorkerThreads : 1;
+int minIOThreads = int.TryParse(Environment.GetEnvironmentVariable("MIN_IO_THREADS"), out minIOThreads) ? minIOThreads : 1;
+ThreadPool.SetMinThreads(minWorkerThreads, minIOThreads);
 
 var builder = WebApplication.CreateBuilder(args);
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .Filter.ByExcluding(Matching.FromSource("Microsoft"))
+    .WriteTo.Console()
+    .WriteTo.File("./logs/myapp-.log", rollingInterval: RollingInterval.Hour)
+    .CreateLogger();
+
+var loggerFactory = LoggerFactory.Create(l =>
+{
+    l.AddSerilog(dispose: true);
+});
+var log = loggerFactory.CreateLogger<ThreadPoolLogger>();
+
+var _ = new ThreadPoolLogger(new TimeSpan(0, 0, 1), log);
+
+builder.WebHost.ConfigureLogging(logging =>
+{
+    logging.ClearProviders();
+    logging.AddConsole();
+    logging.AddSerilog();
+});
 
 // Add services to the container.
 builder.Services.AddRazorPages();
