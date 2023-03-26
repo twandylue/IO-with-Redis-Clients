@@ -8,7 +8,7 @@ public class PlotService
     /// <summary>
     /// Read the data(log) from the file and parse it to LogTemplate
     /// </summary>
-    /// <param name="fileName">"./logs/threadPool/*.jsonl"</param>
+    /// <param name="fileName">"./logs/ThreadPool/*.jsonl"</param>
     /// <returns></returns>
     public static IList<LogTemplate> ParseLog(string fileName)
     {

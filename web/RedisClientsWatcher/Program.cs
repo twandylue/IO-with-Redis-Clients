@@ -13,11 +13,11 @@ var builder = WebApplication.CreateBuilder(args);
 Log.Logger = new LoggerConfiguration()
              .WriteTo.Logger(lc => lc
                                  .Filter.ByIncludingOnly(Matching.FromSource<ThreadPoolLogger>())
-                                 .WriteTo.File(new JsonFormatter(), "./logs/threadPool/threadPool-.jsonl", rollingInterval: RollingInterval.Hour)
+                                 .WriteTo.File(new JsonFormatter(), "./logs/ThreadPool/ThreadPool-.jsonl", rollingInterval: RollingInterval.Hour)
              )
              .WriteTo.Logger(lc => lc
                                  .Filter.ByIncludingOnly(Matching.FromSource<StackExchangeRedisClient>())
-                                 .WriteTo.File(new JsonFormatter(), "./logs/redisClient/redisClient-.jsonl", rollingInterval: RollingInterval.Hour)
+                                 .WriteTo.File(new JsonFormatter(), "./logs/RedisClient/RedisClient-.jsonl", rollingInterval: RollingInterval.Hour)
                                  )
              .CreateLogger();
 
@@ -40,7 +40,6 @@ builder.WebHost.ConfigureLogging(logging =>
 builder.Services.AddRazorPages();
 builder.Services.AddControllers();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddSingleton<StackExchangeRedisClient>();
 builder.Services.AddSingleton<PlotService>();
 builder.Services.AddSingleton<IRedisClient, StackExchangeRedisClient>();
