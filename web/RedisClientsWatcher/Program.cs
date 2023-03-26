@@ -2,6 +2,7 @@ using RedisClientsWatcher.Data;
 using RedisClientsWatcher.Loggers;
 using Serilog;
 using Serilog.Filters;
+using Serilog.Formatting.Json;
 
 int minWorkerThreads = int.TryParse(Environment.GetEnvironmentVariable("MIN_WORKER_THREADS"), out minWorkerThreads) ? minWorkerThreads : 1;
 int minIOThreads = int.TryParse(Environment.GetEnvironmentVariable("MIN_IO_THREADS"), out minIOThreads) ? minIOThreads : 1;
@@ -12,13 +13,13 @@ var builder = WebApplication.CreateBuilder(args);
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
     .Filter.ByExcluding(Matching.FromSource("Microsoft"))
-    .WriteTo.Console()
-    .WriteTo.File("./logs/myapp-.log", rollingInterval: RollingInterval.Hour)
+    // .WriteTo.Console()
+    .WriteTo.File(new JsonFormatter(), "./logs/myapp-.log", rollingInterval: RollingInterval.Hour)
     .CreateLogger();
 
-var loggerFactory = LoggerFactory.Create(l =>
+var loggerFactory = LoggerFactory.Create(logBuilder =>
 {
-    l.AddSerilog(dispose: true);
+    logBuilder.AddSerilog(dispose: true);
 });
 var log = loggerFactory.CreateLogger<ThreadPoolLogger>();
 

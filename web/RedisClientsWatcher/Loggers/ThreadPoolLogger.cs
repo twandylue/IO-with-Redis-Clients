@@ -1,4 +1,7 @@
 // ref: https://github.com/JonCole/SampleCode/blob/master/ThreadPoolMonitor/ThreadPoolLogger.cs
+
+using System.Text.Json;
+
 namespace RedisClientsWatcher.Loggers;
 
 class ThreadPoolLogger : IDisposable
@@ -45,10 +48,11 @@ class ThreadPoolLogger : IDisposable
                                     stats.BusyIoThreads, stats.MinIoThreads, stats.MaxIoThreads,
                                     stats.BusyWorkerThreads, stats.MinWorkerThreads, stats.MaxWorkerThreads,
                                     PerfCounterHelper.GetSystemCPU()
-                                   );
+                                    );
 
-        // Console.WriteLine(message);
-        this._logger.LogInformation(message);
+        Console.WriteLine(message);
+        // this._logger.LogInformation(message);
+        this._logger.LogInformation(JsonSerializer.Serialize(stats.ConvertToLogTemplate()));
     }
 
     /// <summary>
@@ -56,7 +60,7 @@ class ThreadPoolLogger : IDisposable
     /// </summary>
     public static ThreadPoolUsageStats GetThreadPoolStats()
     {
-        //BusyThreads =  TP.GetMaxThreads() –TP.GetAVailable();
+        //BusyThreads =  TP.GetMaxThreads() –TP.GetAvailable();
         //If BusyThreads >= TP.GetMinThreads(), then threadpool growth throttling is possible.
 
         int maxIoThreads, maxWorkerThreads;
@@ -101,4 +105,21 @@ public struct ThreadPoolUsageStats
     public int MinWorkerThreads { get; set; }
 
     public int MaxWorkerThreads { get; set; }
+}
+
+public static class ThreadPoolUsageStatsExtensions
+{
+    public static LogTemplate ConvertToLogTemplate(this ThreadPoolUsageStats stats)
+    {
+        return new LogTemplate
+        {
+            BusyIoThreads = stats.BusyIoThreads,
+            MinIoThreads = stats.MinIoThreads,
+            MaxIoThreads = stats.MaxIoThreads,
+            BusyWorkerThreads = stats.BusyWorkerThreads,
+            MinWorkerThreads = stats.MinWorkerThreads,
+            MaxWorkerThreads = stats.MaxWorkerThreads,
+            Time = DateTimeOffset.UtcNow.ToString("u"),
+        };
+    }
 }
