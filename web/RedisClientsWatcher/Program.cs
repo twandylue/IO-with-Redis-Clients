@@ -11,11 +11,15 @@ ThreadPool.SetMinThreads(minWorkerThreads, minIOThreads);
 var builder = WebApplication.CreateBuilder(args);
 
 Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Information()
-    .Filter.ByExcluding(Matching.FromSource("Microsoft"))
-    // .WriteTo.Console()
-    .WriteTo.File(new JsonFormatter(), "./logs/myapp-.log", rollingInterval: RollingInterval.Hour)
-    .CreateLogger();
+             .WriteTo.Logger(lc => lc
+                                 .Filter.ByIncludingOnly(Matching.FromSource<ThreadPoolLogger>())
+                                 .WriteTo.File(new JsonFormatter(), "./logs/threadPool/threadPool-.jsonl", rollingInterval: RollingInterval.Hour)
+             )
+             .WriteTo.Logger(lc => lc
+                                 .Filter.ByIncludingOnly(Matching.FromSource<StackExchangeRedisClient>())
+                                 .WriteTo.File(new JsonFormatter(), "./logs/redisClient/redisClient-.jsonl", rollingInterval: RollingInterval.Hour)
+                                 )
+             .CreateLogger();
 
 var loggerFactory = LoggerFactory.Create(logBuilder =>
 {
