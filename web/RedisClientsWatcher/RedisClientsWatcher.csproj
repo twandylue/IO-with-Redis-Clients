@@ -16,6 +16,7 @@
 
     <ItemGroup>
       <Folder Include="logs" />
+      <Folder Include="logs\threadPool" />
     </ItemGroup>
 
 </Project>

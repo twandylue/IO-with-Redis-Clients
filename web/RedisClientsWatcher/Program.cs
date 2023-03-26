@@ -42,6 +42,7 @@ builder.Services.AddControllers();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddSingleton<StackExchangeRedisClient>();
+builder.Services.AddSingleton<PlotService>();
 builder.Services.AddSingleton<IRedisClient, StackExchangeRedisClient>();
 builder.Services.AddHealthChecks();
 
