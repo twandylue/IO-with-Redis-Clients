@@ -8,10 +8,12 @@ namespace RedisClientsWatcher.Controllers;
 public class DataController : ControllerBase
 {
     private readonly IRedisClient _redisClient;
+    private readonly ILogger<DataController> _logger;
 
-    public DataController(IRedisClient redisClient)
+    public DataController(IRedisClient redisClient, ILogger<DataController> logger)
     {
         this._redisClient = redisClient;
+        this._logger = logger;
     }
 
     [HttpGet("~/api/v1/data/get/{key}")]
@@ -33,8 +35,17 @@ public class DataController : ControllerBase
     [HttpPost("~/api/v1/data/idempotent-value")]
     public async Task<IActionResult> SetIdempotentValue([FromBody] SetValueParameterModel parameterModel)
     {
-        var valueInCache = await this._redisClient.SetIdempotentValue(parameterModel.Key, parameterModel.Value);
+        try
+        {
+            var valueInCache = await this._redisClient.SetIdempotentValue(parameterModel.Key, parameterModel.Value);
 
-        return this.Ok(valueInCache);
+            return this.Ok(valueInCache);
+        }
+        catch (Exception e)
+        {
+            this._logger.LogError(e, "Error while setting idempotent value");
+
+            return this.BadRequest("Error while setting idempotent value");
+        }
     }
 }

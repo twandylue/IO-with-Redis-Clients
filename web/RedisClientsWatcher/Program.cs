@@ -1,3 +1,4 @@
+using RedisClientsWatcher.Controllers;
 using RedisClientsWatcher.Data;
 using RedisClientsWatcher.Loggers;
 using Serilog;
@@ -18,6 +19,10 @@ Log.Logger = new LoggerConfiguration()
              .WriteTo.Logger(lc => lc
                                  .Filter.ByIncludingOnly(Matching.FromSource<StackExchangeRedisClient>())
                                  .WriteTo.File(new JsonFormatter(), "./logs/RedisClient/RedisClient-.jsonl", rollingInterval: RollingInterval.Hour)
+                                 )
+             .WriteTo.Logger(lc => lc
+                                 .Filter.ByIncludingOnly(Matching.FromSource<DataController>())
+                                 .WriteTo.File(new JsonFormatter(), "./logs/DataController/DataController-.jsonl", rollingInterval: RollingInterval.Hour)
                                  )
              .CreateLogger();
 
