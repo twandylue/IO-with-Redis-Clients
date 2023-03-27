@@ -40,12 +40,17 @@
     };
     
     // Using of the interface IList is important for the event callback!
-    IList<ITrace> data = HandleData("./logs/ThreadPool/ThreadPool-20230327.jsonl");
+    IList<ITrace> data = HandleData(
+        threadPoolLogFilePath: "./logs/ThreadPool/ThreadPool-20230327.jsonl",
+        dataControllerLogFilePath: "./logs/DataController/DataController-20230327.jsonl"
+        );
 
-    private static IList<ITrace> HandleData(string fileName)
+    private static IList<ITrace> HandleData(string threadPoolLogFilePath, string dataControllerLogFilePath)
     {
-        var data = PlotService.ParseThreadPoolLog(fileName);
-        var startTime = DateTimeOffset.Parse(data[0].Time);
+        var threadPoolLog = PlotService.ParseThreadPoolLog(threadPoolLogFilePath);
+        var dataControllerExceptionLog = PlotService.ParseDataControllerExceptionLog(dataControllerLogFilePath);
+        
+        var startTime = DateTimeOffset.Parse(threadPoolLog[0].Time);
         
         return new List<ITrace>
         {
@@ -53,8 +58,8 @@
             {
                 Name = "Busy Worker Threads",
                 Mode = ModeFlag.Lines | ModeFlag.Markers,
-                Y = data.Select(d => d.BusyWorkerThreads as object).ToList(), 
-                X = data.Select(d =>
+                Y = threadPoolLog.Select(d => d.BusyWorkerThreads as object).ToList(), 
+                X = threadPoolLog.Select(d =>
                 {
                     var timeSpan = DateTimeOffset.Parse(d.Time) - startTime;
                     return timeSpan.Seconds as object;
@@ -75,12 +80,27 @@
             {
                 Name = "Busy IO Threads",
                 Mode = ModeFlag.Lines | ModeFlag.Markers,
-                Y = data.Select(d => d.BusyIoThreads as object).ToList(), 
-                X = data.Select(d =>
+                Y = threadPoolLog.Select(d => d.BusyIoThreads as object).ToList(), 
+                X = threadPoolLog.Select(d =>
                 {
                     var timeSpan = DateTime.Parse(d.Time) - startTime;
                     return timeSpan as object;
                 }).ToList()
+            },
+            new Bar
+            {
+                Name = "Data Controller Exceptions",
+                Y = dataControllerExceptionLog.Select(d => d.Count as object).ToList(),
+                X = dataControllerExceptionLog.Select(d =>
+                {
+                    var timeSpan = DateTimeOffset.Parse(d.Time) - startTime;
+                    return timeSpan.Seconds as object;
+                }).ToList(),
+                Marker = new Plotly.Blazor.Traces.BarLib.Marker()
+                {
+                    Color = "red"
+                },
+                Width = (decimal?)0.5,
             }
         };
     }
