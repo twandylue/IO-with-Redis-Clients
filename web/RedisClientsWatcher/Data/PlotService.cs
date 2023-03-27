@@ -13,8 +13,15 @@ public class PlotService
     /// <returns></returns>
     public static IList<ThreadPoolPlotModel> ParseThreadPoolLog(string fileName)
     {
-        var r = File.ReadLines(fileName);
-        var data = r
+        using var fs = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        using var sr = new StreamReader(fs);
+        var lines = new List<string>();
+        while (sr.ReadLine() is { } line)
+        {
+            lines.Add(line);
+        }
+
+        var data = lines
                     .Where(line =>
                     {
                         var e = JsonSerializer.Deserialize<JsonElement>(line);
