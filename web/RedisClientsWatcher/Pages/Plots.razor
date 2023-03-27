@@ -11,13 +11,26 @@
 
 <h3>Plots</h3>
 
-<PlotlyChart @bind-Config="config" @bind-Layout="layout" @bind-Data="data" @ref="chart"/>
+<PlotlyChart @bind-Config="config" @bind-Layout="layout" @bind-Data="data" @bind-Legend="legend" @ref="chart" />
 
 @code {
     PlotlyChart chart;
-    Config config = new Config();
+
+    Legend legend = new Legend()
+    {
+        Font = new Plotly.Blazor.LayoutLib.LegendLib.Font()
+        {
+            Size = 12
+        },
+        BorderWidth = new decimal(15.5),
+    };
+    Config config = new Config()
+    {
+        Responsive = true,
+    };
     Layout layout = new Layout()
     {
+        Height = 500,
         XAxis = new[]
         {
             new XAxis
@@ -36,6 +49,8 @@
                 {
                     Text = "Number"
                 },
+                AutoRange = AutoRangeEnum.True,
+                // Range = new object?[] { 0, null }, 
             },
             new YAxis()
             {
@@ -44,6 +59,8 @@
                     Text = "Requests(Number)",
                 },
                 Overlaying = "y",
+                AutoRange = AutoRangeEnum.True,
+                // Range = new object?[] { 0, null }, 
                 Side = SideEnum.Right,
             }
         }
@@ -136,6 +153,7 @@
                     Color = "red"
                 },
                 Width = (decimal?)0.5,
+                Opacity = new decimal(0.7)
             }
         };
     }
