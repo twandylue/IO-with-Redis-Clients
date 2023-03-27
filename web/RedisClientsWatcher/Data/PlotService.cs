@@ -57,6 +57,53 @@ public class PlotService
         return data!;
     }
 
+    public static IList<DataControllerPlotModel> ParseDataControllerLog(string filePath, string stage)
+    {
+        using var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        using var sr = new StreamReader(fs);
+        var lines = new List<string>();
+        while (sr.ReadLine() is { } line)
+        {
+            lines.Add(line);
+        }
+
+        var data = lines
+            .Select(line => JsonSerializer.Deserialize<JsonElement>(line))
+            .Where(element =>
+            {
+                var currentTime = DateTime.UtcNow;
+                var time = DateTimeOffset.Parse(element.GetProperty("Timestamp").ToString());
+                return time < currentTime;
+            })
+            .Where(element =>
+            {
+                var property = element.GetProperty("Properties");
+
+                var r = property.TryGetProperty("Stage", out var stageProperty);
+                if (!r)
+                {
+                    return false;
+                }
+
+                return stage == stageProperty.ToString();
+            })
+            .Select(ele =>
+            {
+                // var name = ele.GetProperty("ActionName").ToString();
+
+                return new DataControllerPlotModel
+                {
+                    Name = "name",
+                    Stage = stage,
+                    Time = ele.GetProperty("Timestamp").ToString()
+                };
+
+            })
+            .ToList();
+
+        return data;
+    }
+
     public static IList<DataControllerExceptionPlotModel> ParseDataControllerExceptionLog(string filePath)
     {
         using var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);

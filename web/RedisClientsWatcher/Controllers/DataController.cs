@@ -37,7 +37,12 @@ public class DataController : ControllerBase
     {
         try
         {
+            this._logger.LogInformation("Set idempotent value for key: {Key}, value: {Value} at {Stage}", parameterModel.Key, parameterModel.Value, "Entry");
             var valueInCache = await this._redisClient.SetIdempotentValue(parameterModel.Key, parameterModel.Value);
+
+            // throw new Exception("test");
+
+            this._logger.LogInformation("Set idempotent value for key: {Key}, value: {Value} at {Stage}", parameterModel.Key, parameterModel.Value, "Exit");
 
             return this.Ok(valueInCache);
         }

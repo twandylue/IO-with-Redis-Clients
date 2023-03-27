@@ -7,6 +7,7 @@
 @using Plotly.Blazor.Traces
 @using RedisClientsWatcher.Data
 @using Plotly.Blazor.LayoutLib
+@using Plotly.Blazor.LayoutLib.YAxisLib
 
 <h3>Plots</h3>
 
@@ -23,11 +24,11 @@
             {
                 Title = new Plotly.Blazor.LayoutLib.XAxisLib.Title()
                 {
-                    Text = "Time(hh:mm:ss)"
+                    Text = "Time(seconds)"
                 },
             },
         },
-        YAxis = new[]
+        YAxis = new List<YAxis>()
         {
             new YAxis()
             {
@@ -35,6 +36,15 @@
                 {
                     Text = "Number"
                 },
+            },
+            new YAxis()
+            {
+                Title = new Plotly.Blazor.LayoutLib.YAxisLib.Title()
+                {
+                    Text = "Requests(Number)",
+                },
+                Overlaying = "y",
+                Side = SideEnum.Right,
             }
         }
     };
@@ -49,6 +59,10 @@
     {
         var threadPoolLog = PlotService.ParseThreadPoolLog(threadPoolLogFilePath);
         var dataControllerExceptionLog = PlotService.ParseDataControllerExceptionLog(dataControllerLogFilePath);
+        var dataControllerLogEntry = PlotService.ParseDataControllerLog(dataControllerLogFilePath, "Entry");
+        var countEntry = 0;
+        var dataControllerLogExit = PlotService.ParseDataControllerLog(dataControllerLogFilePath, "Exit");
+        var countExit = 0;
         
         var startTime = DateTimeOffset.Parse(threadPoolLog[0].Time);
         
@@ -65,17 +79,6 @@
                     return timeSpan.Seconds as object;
                 }).ToList()
             },
-            // new Scatter
-            // {
-            //     Name = "Max Worker Threads",
-            //     Mode = ModeFlag.Lines | ModeFlag.Markers,
-            //     Y = data.Select(d => d.MaxWorkerThreads as object).ToList(), 
-            //     X = data.Select(d =>
-            //     {
-            //         var timeSpan = DateTime.Parse(d.Time) - startTime;
-            //         return timeSpan as object;
-            //     }).ToList()
-            // },
             new Scatter
             {
                 Name = "Busy IO Threads",
@@ -85,6 +88,38 @@
                 {
                     var timeSpan = DateTime.Parse(d.Time) - startTime;
                     return timeSpan as object;
+                }).ToList()
+            },
+            new Scatter
+            {
+                Name = "DataController-Entry",
+                Mode = ModeFlag.Lines | ModeFlag.Markers,
+                Y = dataControllerLogEntry.Select(_ =>
+                {
+                    countEntry += 1;
+                    return countEntry as object;
+                }).ToList(), 
+                YAxis = "y2",
+                X = dataControllerLogEntry.Select(d =>
+                {
+                    var timeSpan = DateTime.Parse(d.Time) - startTime;
+                    return timeSpan.Seconds as object;
+                }).ToList()
+            },
+            new Scatter
+            {
+                Name = "DataController-Exit",
+                Mode = ModeFlag.Lines | ModeFlag.Markers,
+                Y = dataControllerLogExit.Select(_ =>
+                {
+                    countExit += 1;
+                    return countExit as object;
+                }).ToList(), 
+                YAxis = "y2",
+                X = dataControllerLogExit.Select(d =>
+                {
+                    var timeSpan = DateTime.Parse(d.Time) - startTime;
+                    return timeSpan.Seconds as object;
                 }).ToList()
             },
             new Bar

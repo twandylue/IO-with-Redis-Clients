@@ -17,6 +17,7 @@ Log.Logger = new LoggerConfiguration()
                                  .WriteTo.File(new JsonFormatter(), "./logs/ThreadPool/ThreadPool-.jsonl", rollingInterval: RollingInterval.Day)
              )
              .WriteTo.Logger(lc => lc
+                                 .MinimumLevel.Error()
                                  .Filter.ByIncludingOnly(Matching.FromSource<StackExchangeRedisClient>())
                                  .WriteTo.File(new JsonFormatter(), "./logs/RedisClient/RedisClient-.jsonl", rollingInterval: RollingInterval.Day)
                                  )
