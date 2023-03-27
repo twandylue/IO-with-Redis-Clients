@@ -14,15 +14,15 @@ var builder = WebApplication.CreateBuilder(args);
 Log.Logger = new LoggerConfiguration()
              .WriteTo.Logger(lc => lc
                                  .Filter.ByIncludingOnly(Matching.FromSource<ThreadPoolLogger>())
-                                 .WriteTo.File(new JsonFormatter(), "./logs/ThreadPool/ThreadPool-.jsonl", rollingInterval: RollingInterval.Hour)
+                                 .WriteTo.File(new JsonFormatter(), "./logs/ThreadPool/ThreadPool-.jsonl", rollingInterval: RollingInterval.Day)
              )
              .WriteTo.Logger(lc => lc
                                  .Filter.ByIncludingOnly(Matching.FromSource<StackExchangeRedisClient>())
-                                 .WriteTo.File(new JsonFormatter(), "./logs/RedisClient/RedisClient-.jsonl", rollingInterval: RollingInterval.Hour)
+                                 .WriteTo.File(new JsonFormatter(), "./logs/RedisClient/RedisClient-.jsonl", rollingInterval: RollingInterval.Day)
                                  )
              .WriteTo.Logger(lc => lc
                                  .Filter.ByIncludingOnly(Matching.FromSource<DataController>())
-                                 .WriteTo.File(new JsonFormatter(), "./logs/DataController/DataController-.jsonl", rollingInterval: RollingInterval.Hour)
+                                 .WriteTo.File(new JsonFormatter(), "./logs/DataController/DataController-.jsonl", rollingInterval: RollingInterval.Day)
                                  )
              .CreateLogger();
 

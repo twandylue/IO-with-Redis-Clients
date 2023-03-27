@@ -119,7 +119,6 @@ public static class ThreadPoolUsageStatsExtensions
             BusyWorkerThreads = stats.BusyWorkerThreads,
             MinWorkerThreads = stats.MinWorkerThreads,
             MaxWorkerThreads = stats.MaxWorkerThreads,
-            Time = DateTimeOffset.UtcNow.ToString("u"),
         };
     }
 }

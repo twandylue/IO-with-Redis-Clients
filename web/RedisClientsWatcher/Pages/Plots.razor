@@ -40,12 +40,12 @@
     };
     
     // Using of the interface IList is important for the event callback!
-    IList<ITrace> data = HandleData("./logs/ThreadPool/ThreadPool-2023032700.jsonl");
+    IList<ITrace> data = HandleData("./logs/ThreadPool/ThreadPool-test.jsonl");
 
     private static IList<ITrace> HandleData(string fileName)
     {
-        var data = PlotService.ParseLog(fileName);
-        var startTime = DateTime.Parse(data[0].Time);
+        var data = PlotService.ParseThreadPoolLog(fileName);
+        var startTime = DateTimeOffset.Parse(data[0].Time);
         
         return new List<ITrace>
         {
@@ -56,8 +56,8 @@
                 Y = data.Select(d => d.BusyWorkerThreads as object).ToList(), 
                 X = data.Select(d =>
                 {
-                    var timeSpan = DateTime.Parse(d.Time) - startTime;
-                    return timeSpan as object;
+                    var timeSpan = DateTimeOffset.Parse(d.Time) - startTime;
+                    return timeSpan.Seconds as object;
                 }).ToList()
             },
             // new Scatter

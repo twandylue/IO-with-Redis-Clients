@@ -1,6 +1,6 @@
-namespace RedisClientsWatcher.Loggers;
+namespace RedisClientsWatcher.Data.Models;
 
-public class LogTemplate
+public class ThreadPoolPlotModel
 {
     public int BusyIoThreads { get; set; }
 
@@ -13,4 +13,6 @@ public class LogTemplate
     public int MinWorkerThreads { get; set; }
 
     public int MaxWorkerThreads { get; set; }
+
+    public string Time { get; set; }
 }
